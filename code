@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int id;
+    char name[50];
+    float math, science, english;
+    float total;
+} Student;
+
+void addStudent() {
+    FILE *fp = fopen("students.dat", "ab");
+    Student s;
+
+    printf("\nEnter Student ID: ");
+    scanf("%d", &s.id);
+    getchar(); // Clear buffer
+    printf("Enter Name: ");
+    fgets(s.name, 50, stdin);
+    s.name[strcspn(s.name, "\n")] = 0;
+    printf("Enter Marks (Math Science English): ");
+    scanf("%f %f %f", &s.math, &s.science, &s.english);
+    
+    s.total = s.math + s.science + s.english;
+
+    fwrite(&s, sizeof(Student), 1, fp);
+    fclose(fp);
+    printf("Record added successfully!\n");
+}
+
+void displayStudents() {
+    FILE *fp = fopen("students.dat", "rb");
+    Student s;
+
+    if (!fp) {
+        printf("\nNo records found.\n");
+        return;
+    }
+
+    printf("\nID\tName\t\tMath\tSci\tEng\tTotal\n");
+    printf("------------------------------------------------------------\n");
+    while (fread(&s, sizeof(Student), 1, fp)) {
+        printf("%d\t%-15s\t%.1f\t%.1f\t%.1f\t%.1f\n", s.id, s.name, s.math, s.science, s.english, s.total);
+    }
+    fclose(fp);
+}
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\n--- Student Marks Management System ---");
+        printf("\n1. Add Student");
+        printf("\n2. View All Students");
+        printf("\n3. Exit");
+        printf("\nSelect an option: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: addStudent(); break;
+            case 2: displayStudents(); break;
+            case 3: exit(0);
+            default: printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
